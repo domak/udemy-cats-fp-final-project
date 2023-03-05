@@ -20,7 +20,14 @@ trait Generators {
     * care of only producing valid values (check out
     * the constraints in Person.create) .
     */
-  implicit val personArb: Arbitrary[Person] = ???
+  implicit val personArb
+      : Arbitrary[Person] = //Arbitrary(Person.unsafeCreate(""))
+    Arbitrary {
+      for {
+        n <- Gen.choose(1, 32)
+        name <- Gen.stringOfN(n, Gen.alphaChar)
+      } yield Person.unsafeCreate(name)
+    }
 
   implicit val moneyArb: Arbitrary[Money] = Arbitrary {
     Gen.choose(1, 1e9.toInt).map(Money.unsafeCreate)
@@ -33,7 +40,14 @@ trait Generators {
   implicit def expenseArb(implicit
       arbPerson: Arbitrary[Person],
       arbMoney: Arbitrary[Money]
-  ): Arbitrary[Expense] = ???
+  ): Arbitrary[Expense] =
+    Arbitrary {
+      for {
+        payer <- arbPerson.arbitrary
+        amount <- arbMoney.arbitrary
+        persons <- Gen.nonEmptyListOf(arbPerson.arbitrary)
+      } yield Expense.unsafeCreate(payer, amount, persons)
+    }
 
   implicit val payeeDebtArb: Arbitrary[DebtByPayee] = Arbitrary {
     Gen
@@ -101,7 +115,13 @@ trait Generators {
   implicit def personOpArb[A](implicit
       arbA: Arbitrary[A],
       arbPersonState: Arbitrary[PersonState]
-  ): Arbitrary[PersonOp[A]] = ???
+  ): Arbitrary[PersonOp[A]] =
+    Arbitrary {
+      for {
+        ps <- arbPersonState.arbitrary
+        a <- arbA.arbitrary
+      } yield State((_: PersonState) => (ps, a))
+    }
 
   implicit def isValidArb[A](implicit
       arbA: Arbitrary[A]

@@ -1,7 +1,9 @@
 package fpfinal.model
 
+import cats.Monoid
 import cats.data.NonEmptySet
 import cats.implicits._
+import cats.kernel.Eq
 import cats.kernel.laws.discipline.{EqTests, MonoidTests}
 import fpfinal.FpFinalSpec
 
@@ -101,4 +103,6 @@ class DebtByPayeeSpec extends FpFinalSpec {
   }
 
   // TODO #17: Add typeclass tests for Eq and Monoid
+  checkAll("Eq[DebtByPayee]", EqTests[DebtByPayee].eqv)
+  checkAll("Monoid[DebtByPayee]", MonoidTests[DebtByPayee].monoid)
 }

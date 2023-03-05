@@ -44,6 +44,7 @@ class ExpenseSpec extends FpFinalSpec {
       Money.unsafeCreate(1000),
       List(Person.unsafeCreate("Susan"), Person.unsafeCreate("Bob"))
     )
+    println(e.show)
     assert(
       e.show eqv "Expense[Payer=Martin,Amount=$10.00,Participants=Bob,Susan]"
     )

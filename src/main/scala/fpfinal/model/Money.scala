@@ -9,39 +9,40 @@ import fpfinal.model.Money.showMoney
 import scala.util.Try
 
 /**
- * Simple class for representing money amounts.
- *
- * It operates on cents, in order to keep a better precision.
- *
- * @param _cents the amount in cents
- */
+  * Simple class for representing money amounts.
+  *
+  * It operates on cents, in order to keep a better precision.
+  *
+  * @param _cents the amount in cents
+  */
 class Money private (_cents: Int) {
+
   /**
-   * @return the amount expressed in cents
-   */
+    * @return the amount expressed in cents
+    */
   def cents: Int = _cents
 
   /**
-   * @return the amount expressed in dollars
-   */
+    * @return the amount expressed in dollars
+    */
   def dollars: Double = _cents / 100.0
 
   /**
-   * Adds this money amount to another money amount,
-   * keeping precision up to the cents.
-   */
+    * Adds this money amount to another money amount,
+    * keeping precision up to the cents.
+    */
   def plus(other: Money): Money = new Money(_cents + other.cents)
 
   /**
-   * Substracts a money amount from this money amount,
-   * keeping precision up to the cents.
-   */
+    * Substracts a money amount from this money amount,
+    * keeping precision up to the cents.
+    */
   def minus(other: Money): Money = new Money(_cents - other.cents)
 
   /**
-   * Multiplies this money amount by a constant factor,
-   * keeping precision up to the cents.
-   */
+    * Multiplies this money amount by a constant factor,
+    * keeping precision up to the cents.
+    */
   def times(n: Int): Money = new Money(_cents * n)
 
   /**
@@ -51,22 +52,25 @@ class Money private (_cents: Int) {
     * For simplicity we don't care about losing cents. For example, dividing 1 dollar
     * by 3 should yield 33 cents.
     */
-  def divideBy(n: Int): Option[Money] = ???
+  def divideBy(n: Int): Option[Money] =
+    // if (n == 0) None else Some(Money.unsafeCreate(cents  / n))
+    Try(new Money(cents / n)).toOption
 
   /**
-   * @return a string representation of this money amount in dollars, with two decimal places
-   *         and a dollar sign (e.g. $45.33)
-   */
+    * @return a string representation of this money amount in dollars, with two decimal places
+    *         and a dollar sign (e.g. $45.33)
+    */
   override def toString: String = showMoney.show(this)
 }
 
 object Money {
+
   /**
-   * Creates an instance of Money without performing any validations.
-   * Should only be used in tests.
-   *
-   * @param cents the amount expressed in cents
-   */
+    * Creates an instance of Money without performing any validations.
+    * Should only be used in tests.
+    *
+    * @param cents the amount expressed in cents
+    */
   def unsafeCreate(cents: Int): Money = new Money(cents)
 
   val zero: Money = new Money(0)
@@ -77,7 +81,11 @@ object Money {
     * - Amount should be non-negative
     */
   def dollars(amount: Double): IsValid[Money] =
-    ???
+    // Validated.condNec(amount >= 0, Money.unsafeCreate((amount*100).toInt), "amount is negative")
+    nonNegative(amount).map { dls =>
+      val cents = (dls * 100).toInt
+      new Money(cents)
+    }
 
   implicit val monoidMoney: Monoid[Money] = Monoid.instance(zero, _ plus _)
 
@@ -90,5 +98,6 @@ object Money {
     * TODO #4: Implement and instance of Order for Money that compares its cents.
     * Use the given Order instance for comparing any Int values.
     */
-  implicit def orderMoney(implicit orderInt: Order[Int]): Order[Money] = ???
+  implicit def orderMoney(implicit orderInt: Order[Int]): Order[Money] =
+    Order.by(_.cents)
 }
