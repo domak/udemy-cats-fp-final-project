@@ -1,6 +1,7 @@
 package fpfinal.common
 
 import cats.Order
+import cats.data.Validated.Invalid
 import cats.data.{NonEmptyChain, NonEmptySet, Validated}
 import fpfinal.app.Configuration.IsValid
 
@@ -14,7 +15,9 @@ object Validations {
     * TODO #1: Check that this String's length does not exceed the provided limit.
     */
   def maxLength(s: String, n: Int): IsValid[String] =
-    ???
+    if (s.length <= n) Validated.Valid(s)
+    else Invalid(NonEmptyChain.one("string length exceed limit - lenght: $n - string: $s"))
+
 
   /**
     * TODO #2: Turn this String into a validated double

@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "2.13.1"
+scalaVersion := "2.13.1"
 ThisBuild / organization := "com.example"
 
 lazy val hello = (project in file("."))
@@ -6,9 +6,7 @@ lazy val hello = (project in file("."))
     name := "Final project"
   )
 
-addCompilerPlugin(
-  "org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.full
-)
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.full)
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.1.1"
 libraryDependencies += "org.typelevel" %% "cats-laws" % "2.1.1"
